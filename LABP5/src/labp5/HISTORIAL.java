@@ -5,7 +5,14 @@
  */
 package labp5;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.LinkedList;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -84,6 +91,11 @@ public class HISTORIAL extends javax.swing.JFrame {
         });
 
         Guardar.setText("Guardar ");
+        Guardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                GuardarActionPerformed(evt);
+            }
+        });
 
         Cargar.setText("Cargar");
         Cargar.addActionListener(new java.awt.event.ActionListener() {
@@ -162,7 +174,7 @@ public class HISTORIAL extends javax.swing.JFrame {
      USUARIO U = new USUARIO();
      U.setId(USUARIOS.size());
      U.setNombre(NombreTextField.getText());
-      U.setSemestre(SemestreTextField.getText());
+     U.setSemestre(SemestreTextField.getText());
      
       USUARIOS.add(U); 
       
@@ -173,9 +185,112 @@ public class HISTORIAL extends javax.swing.JFrame {
     }//GEN-LAST:event_CrearActionPerformed
 
     private void CargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CargarActionPerformed
+     JFileChooser seleccionarArchivo = new JFileChooser ();
+     FileNameExtensionFilter filtro = new  FileNameExtensionFilter("Archivos csv","csv");
+     
+     seleccionarArchivo.setFileFilter(filtro);
+     
+     int seleccionar = seleccionarArchivo.showOpenDialog(this);
+     
+        if (seleccionar == JFileChooser.APPROVE_OPTION) {
+            
+            File archivo = seleccionarArchivo.getSelectedFile();
+            cargarArchivo(archivo);
+        } 
      
     }//GEN-LAST:event_CargarActionPerformed
 
+    private void GuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GuardarActionPerformed
+     JFileChooser seleccionarArchivo = new JFileChooser ();
+     FileNameExtensionFilter filtro = new  FileNameExtensionFilter("csv","csv");
+     
+     seleccionarArchivo.setFileFilter(filtro);
+     
+     int seleccionar = seleccionarArchivo.showOpenDialog(this);
+     
+        if (seleccionar == JFileChooser.APPROVE_OPTION) {
+            
+            File archivo = seleccionarArchivo.getSelectedFile();
+            guardarArchivo(archivo);
+        } 
+    }//GEN-LAST:event_GuardarActionPerformed
+    public void guardarArchivo(File archivo){
+    
+    
+    FileWriter fichero = null;
+    PrintWriter pw= null;
+    
+    
+    try{
+    
+        fichero = new FileWriter(archivo);
+        pw = new PrintWriter(fichero);
+        
+        for (USUARIO U: USUARIOS) {
+            
+            String linea = U.getId()+";"+U.getNombre()+";"+U.getSemestre();
+            pw.println(linea);
+        }
+    }catch(Exception ex){
+        
+        ex.printStackTrace();
+    }
+    finally{
+       try{
+           if (fichero!=null) {
+               fichero.close();
+           }
+       
+           }catch(Exception e){
+              e.printStackTrace();
+           }
+    }
+    }
+    
+    public void cargarArchivo(File archivo){
+    
+    FileReader fr = null;
+    BufferedReader br = null;
+    
+    try{
+    fr = new FileReader(archivo);
+    br = new BufferedReader(fr);
+        
+    String linea;
+    
+    while((linea = br.readLine())!=null){
+        
+      
+      String arreglo [] = linea.split(",");
+        if (arreglo.length>=3) {
+            USUARIO U = new USUARIO();
+            U.setId(Integer.parseInt(arreglo[0]));
+            U.setNombre(arreglo[1]);
+            U.setSemestre(arreglo[2]);
+            USUARIOS.add(U);
+            
+        }
+    }
+    LlenarTabla();
+    
+      }catch(Exception ex){
+          ex.printStackTrace();
+    
+    }
+    finally{
+    
+        try{
+            if (fr!=null) {
+                fr.close();
+            }
+        }catch(Exception ex){
+        ex.printStackTrace();
+        }
+    }
+    
+    
+    
+    }
     /**
      * @param args the command line arguments
      */
